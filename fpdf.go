@@ -36,6 +36,7 @@ import (
 	"math"
 	"os"
 	"path"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -243,7 +244,12 @@ func addFont(familyStr, styleStr, fileStr string, f *Fpdf) {
 
 	var fileBytes []byte
 	fileLocation := path.Join(f.fontpath, fileStr)
-	fileBytes, f.err = os.ReadFile(fileLocation)
+	absPath, err := filepath.Abs(fileLocation)
+	if err != nil {
+		f.err = err
+		return
+	}
+	fileBytes, f.err = os.ReadFile(absPath)
 	if f.err != nil {
 		return
 	}
