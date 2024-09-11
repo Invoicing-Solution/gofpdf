@@ -36,7 +36,6 @@ import (
 	"math"
 	"os"
 	"path"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -210,51 +209,28 @@ func fpdfNew(orientationStr, unitStr, sizeStr, fontDirStr string, size SizeType)
 	f.modDate = gl.modDate
 	f.userUnderlineThickness = 1
 
-	addFont("Arial", "", "./font/Arial.ttf", f)
-	addFont("Arial", "B", "./font/Arial-Bold.ttf", f)
-	addFont("Arial", "I", "./font/Arial-Italic.ttf", f)
-	addFont("Arial", "BI", "./font/Arial-BoldItalic.ttf", f)
-
-	addFont("Arimo", "", "./font/Arimo.ttf", f)
-	addFont("Arimo", "B", "./font/Arimo-Bold.ttf", f)
-	addFont("Arimo", "I", "./font/Arimo-Italic.ttf", f)
-	addFont("Arimo", "BI", "./font/Arimo-BoldItalic.ttf", f)
-
-	addFont("Inter", "", "./font/Inter.ttf", f)
-	addFont("Inter", "B", "./font/Inter-Bold.ttf", f)
-	addFont("Inter", "I", "./font/Inter-Italic.ttf", f)
-	addFont("Inter", "BI", "./font/Inter-BoldItalic.ttf", f)
+	addCustomFonts(f)
 
 	return
 }
 
-func addFont(familyStr, styleStr, fileStr string, f *Fpdf) {
-	if f.err != nil {
-		return
-	}
-	if familyStr == "" {
-		f.err = fmt.Errorf("familyStr is empty")
-		return
-	}
+func addCustomFont(f *Fpdf, name, style string, bytes []byte) {
+	f.AddUTF8FontFromBytes(name, style, bytes)
+}
 
-	if fileStr == "" {
-		f.err = fmt.Errorf("fileStr is empty")
-		return
-	}
-
-	var fileBytes []byte
-	fileLocation := path.Join(f.fontpath, fileStr)
-	absPath, err := filepath.Abs(fileLocation)
-	if err != nil {
-		f.err = err
-		return
-	}
-	fileBytes, f.err = os.ReadFile(absPath)
-	if f.err != nil {
-		return
-	}
-
-	f.AddUTF8FontFromBytes(familyStr, styleStr, fileBytes)
+func addCustomFonts(f *Fpdf) {
+	addCustomFont(f, "Arial", "", arial)
+	addCustomFont(f, "Arial", "B", arialBold)
+	addCustomFont(f, "Arial", "I", arialItalic)
+	addCustomFont(f, "Arial", "BI", arialBoldItalic)
+	addCustomFont(f, "Arimo", "", arimo)
+	addCustomFont(f, "Arimo", "B", arimoBold)
+	addCustomFont(f, "Arimo", "I", arimoItalic)
+	addCustomFont(f, "Arimo", "BI", arimoBoldItalic)
+	addCustomFont(f, "Inter", "", inter)
+	addCustomFont(f, "Inter", "B", interBold)
+	addCustomFont(f, "Inter", "I", interItalic)
+	addCustomFont(f, "Inter", "BI", interBoldItalic)
 }
 
 // NewCustom returns a pointer to a new Fpdf instance. Its methods are
