@@ -1,9 +1,9 @@
 package httpimg_test
 
 import (
-	"github.com/jung-kurt/gofpdf"
-	"github.com/jung-kurt/gofpdf/contrib/httpimg"
-	"github.com/jung-kurt/gofpdf/internal/example"
+	"github.com/Invoicing-Solution/gofpdf"
+	"github.com/Invoicing-Solution/gofpdf/contrib/httpimg"
+	"github.com/Invoicing-Solution/gofpdf/internal/example"
 )
 
 func ExampleRegister() {

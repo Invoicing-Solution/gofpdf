@@ -20,8 +20,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/jung-kurt/gofpdf"
-	"github.com/jung-kurt/gofpdf/internal/example"
+	"github.com/Invoicing-Solution/gofpdf"
+	"github.com/Invoicing-Solution/gofpdf/internal/example"
 )
 
 func ExampleTtfParse() {
@@ -60,8 +60,10 @@ func ExampleFpdf_GetStringWidth() {
 	pdf.SetFont("Helvetica", "", 12)
 	pdf.AddPage()
 	for _, s := range []string{"Hello", "世界", "\xe7a va?"} {
-		fmt.Printf("%-32s width %5.2f, bytes %2d, runes %2d\n",
-			hexStr(s), pdf.GetStringWidth(s), len(s), len([]rune(s)))
+		fmt.Printf(
+			"%-32s width %5.2f, bytes %2d, runes %2d\n",
+			hexStr(s), pdf.GetStringWidth(s), len(s), len([]rune(s)),
+		)
 		if pdf.Err() {
 			fmt.Println(pdf.Error())
 		}

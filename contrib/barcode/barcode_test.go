@@ -3,11 +3,11 @@ package barcode_test
 import (
 	"testing"
 
+	"github.com/Invoicing-Solution/gofpdf"
+	"github.com/Invoicing-Solution/gofpdf/contrib/barcode"
+	"github.com/Invoicing-Solution/gofpdf/internal/example"
 	"github.com/boombuler/barcode/code128"
 	"github.com/boombuler/barcode/qr"
-	"github.com/jung-kurt/gofpdf"
-	"github.com/jung-kurt/gofpdf/contrib/barcode"
-	"github.com/jung-kurt/gofpdf/internal/example"
 )
 
 func createPdf() (pdf *gofpdf.Fpdf) {
