@@ -208,7 +208,46 @@ func fpdfNew(orientationStr, unitStr, sizeStr, fontDirStr string, size SizeType)
 	f.creationDate = gl.creationDate
 	f.modDate = gl.modDate
 	f.userUnderlineThickness = 1
+
+	addFont("Arial", "", "./font/Arial.ttf", f)
+	addFont("Arial", "B", "./font/Arial-Bold.ttf", f)
+	addFont("Arial", "I", "./font/Arial-Italic.ttf", f)
+	addFont("Arial", "BI", "./font/Arial-BoldItalic.ttf", f)
+
+	addFont("Arimo", "", "./font/Arimo.ttf", f)
+	addFont("Arimo", "B", "./font/Arimo-Bold.ttf", f)
+	addFont("Arimo", "I", "./font/Arimo-Italic.ttf", f)
+	addFont("Arimo", "BI", "./font/Arimo-BoldItalic.ttf", f)
+
+	addFont("Inter", "", "./font/Inter.ttf", f)
+	addFont("Inter", "B", "./font/Inter-Bold.ttf", f)
+	addFont("Inter", "I", "./font/Inter-Italic.ttf", f)
+	addFont("Inter", "BI", "./font/Inter-BoldItalic.ttf", f)
+
 	return
+}
+
+func addFont(familyStr, styleStr, fileStr string, f *Fpdf) {
+	if f.err != nil {
+		return
+	}
+	if familyStr == "" {
+		f.err = fmt.Errorf("familyStr is empty")
+		return
+	}
+
+	if fileStr == "" {
+		f.err = fmt.Errorf("fileStr and fileBytes are empty")
+		return
+	}
+
+	var fileBytes []byte
+	fileBytes, f.err = os.ReadFile(fileStr)
+	if f.err != nil {
+		return
+	}
+
+	f.AddUTF8FontFromBytes(familyStr, styleStr, fileBytes)
 }
 
 // NewCustom returns a pointer to a new Fpdf instance. Its methods are
@@ -1248,8 +1287,10 @@ func (f *Fpdf) point(x, y float64) {
 // curve outputs a single cubic Bézier curve segment from current point
 func (f *Fpdf) curve(cx0, cy0, cx1, cy1, x, y float64) {
 	// Thanks, Robert Lillack, for straightening this out
-	f.outf("%.5f %.5f %.5f %.5f %.5f %.5f c", cx0*f.k, (f.h-cy0)*f.k, cx1*f.k,
-		(f.h-cy1)*f.k, x*f.k, (f.h-y)*f.k)
+	f.outf(
+		"%.5f %.5f %.5f %.5f %.5f %.5f c", cx0*f.k, (f.h-cy0)*f.k, cx1*f.k,
+		(f.h-cy1)*f.k, x*f.k, (f.h-y)*f.k,
+	)
 }
 
 // Curve draws a single-segment quadratic Bézier curve. The curve starts at
@@ -1267,8 +1308,10 @@ func (f *Fpdf) curve(cx0, cy0, cx1, cy1, x, y float64) {
 // The Circle() example demonstrates this method.
 func (f *Fpdf) Curve(x0, y0, cx, cy, x1, y1 float64, styleStr string) {
 	f.point(x0, y0)
-	f.outf("%.5f %.5f %.5f %.5f v %s", cx*f.k, (f.h-cy)*f.k, x1*f.k, (f.h-y1)*f.k,
-		fillDrawOp(styleStr))
+	f.outf(
+		"%.5f %.5f %.5f %.5f v %s", cx*f.k, (f.h-cy)*f.k, x1*f.k, (f.h-y1)*f.k,
+		fillDrawOp(styleStr),
+	)
 }
 
 // CurveCubic draws a single-segment cubic Bézier curve. This routine performs
@@ -1299,8 +1342,10 @@ func (f *Fpdf) CurveCubic(x0, y0, cx0, cy0, x1, y1, cx1, cy1 float64, styleStr s
 // The Circle() example demonstrates this method.
 func (f *Fpdf) CurveBezierCubic(x0, y0, cx0, cy0, cx1, cy1, x1, y1 float64, styleStr string) {
 	f.point(x0, y0)
-	f.outf("%.5f %.5f %.5f %.5f %.5f %.5f c %s", cx0*f.k, (f.h-cy0)*f.k,
-		cx1*f.k, (f.h-cy1)*f.k, x1*f.k, (f.h-y1)*f.k, fillDrawOp(styleStr))
+	f.outf(
+		"%.5f %.5f %.5f %.5f %.5f %.5f c %s", cx0*f.k, (f.h-cy0)*f.k,
+		cx1*f.k, (f.h-cy1)*f.k, x1*f.k, (f.h-y1)*f.k, fillDrawOp(styleStr),
+	)
 }
 
 // Arc draws an elliptical arc centered at point (x, y). rx and ry specify its
@@ -1390,8 +1435,12 @@ func (f *Fpdf) gradient(tp, r1, g1, b1, r2, g2, b2 int, x1, y1, x2, y2, r float6
 	pos := len(f.gradientList)
 	clr1 := rgbColorValue(r1, g1, b1, "", "")
 	clr2 := rgbColorValue(r2, g2, b2, "", "")
-	f.gradientList = append(f.gradientList, gradientType{tp, clr1.str, clr2.str,
-		x1, y1, x2, y2, r, 0})
+	f.gradientList = append(
+		f.gradientList, gradientType{
+			tp, clr1.str, clr2.str,
+			x1, y1, x2, y2, r, 0,
+		},
+	)
 	f.outf("/Sh%d sh", pos)
 }
 
@@ -1470,8 +1519,10 @@ func (f *Fpdf) ClipText(x, y float64, txtStr string, outline bool) {
 
 func (f *Fpdf) clipArc(x1, y1, x2, y2, x3, y3 float64) {
 	h := f.h
-	f.outf("%.5f %.5f %.5f %.5f %.5f %.5f c ", x1*f.k, (h-y1)*f.k,
-		x2*f.k, (h-y2)*f.k, x3*f.k, (h-y3)*f.k)
+	f.outf(
+		"%.5f %.5f %.5f %.5f %.5f %.5f c ", x1*f.k, (h-y1)*f.k,
+		x2*f.k, (h-y2)*f.k, x3*f.k, (h-y3)*f.k,
+	)
 }
 
 // ClipRoundedRect begins a rectangular clipping operation. The rectangle is of
@@ -1547,24 +1598,32 @@ func (f *Fpdf) ClipEllipse(x, y, rx, ry float64, outline bool) {
 	ly := (4.0 / 3.0) * ry * (math.Sqrt2 - 1)
 	k := f.k
 	h := f.h
-	f.outf("q %.5f %.5f m %.5f %.5f %.5f %.5f %.5f %.5f c",
+	f.outf(
+		"q %.5f %.5f m %.5f %.5f %.5f %.5f %.5f %.5f c",
 		(x+rx)*k, (h-y)*k,
 		(x+rx)*k, (h-(y-ly))*k,
 		(x+lx)*k, (h-(y-ry))*k,
-		x*k, (h-(y-ry))*k)
-	f.outf("%.5f %.5f %.5f %.5f %.5f %.5f c",
+		x*k, (h-(y-ry))*k,
+	)
+	f.outf(
+		"%.5f %.5f %.5f %.5f %.5f %.5f c",
 		(x-lx)*k, (h-(y-ry))*k,
 		(x-rx)*k, (h-(y-ly))*k,
-		(x-rx)*k, (h-y)*k)
-	f.outf("%.5f %.5f %.5f %.5f %.5f %.5f c",
+		(x-rx)*k, (h-y)*k,
+	)
+	f.outf(
+		"%.5f %.5f %.5f %.5f %.5f %.5f c",
 		(x-rx)*k, (h-(y+ly))*k,
 		(x-lx)*k, (h-(y+ry))*k,
-		x*k, (h-(y+ry))*k)
-	f.outf("%.5f %.5f %.5f %.5f %.5f %.5f c W %s",
+		x*k, (h-(y+ry))*k,
+	)
+	f.outf(
+		"%.5f %.5f %.5f %.5f %.5f %.5f c W %s",
 		(x+lx)*k, (h-(y+ry))*k,
 		(x+rx)*k, (h-(y+ly))*k,
 		(x+rx)*k, (h-y)*k,
-		strIf(outline, "S", "n"))
+		strIf(outline, "S", "n"),
+	)
 }
 
 // ClipCircle begins a circular clipping operation. The circle is centered at
@@ -2166,8 +2225,10 @@ func (f *Fpdf) newLink(x, y, w, h float64, link int, linkStr string) {
 	// linkList = make([]linkType, 0, 8)
 	// f.pageLinks[f.page] = linkList
 	// }
-	f.pageLinks[f.page] = append(f.pageLinks[f.page],
-		linkType{x * f.k, f.hPt - y*f.k, w * f.k, h * f.k, link, linkStr})
+	f.pageLinks[f.page] = append(
+		f.pageLinks[f.page],
+		linkType{x * f.k, f.hPt - y*f.k, w * f.k, h * f.k, link, linkStr},
+	)
 }
 
 // Link puts a link on a rectangular area of the page. Text or image links are
@@ -2198,7 +2259,10 @@ func (f *Fpdf) Bookmark(txtStr string, level int, y float64) {
 	if f.isCurrentUTF8 {
 		txtStr = utf8toutf16(txtStr)
 	}
-	f.outlines = append(f.outlines, outlineType{text: txtStr, level: level, y: y, p: f.PageNo(), prev: -1, last: -1, next: -1, first: -1})
+	f.outlines = append(
+		f.outlines,
+		outlineType{text: txtStr, level: level, y: y, p: f.PageNo(), prev: -1, last: -1, next: -1, first: -1},
+	)
 }
 
 // Text prints a character string. The origin (x, y) is on the left of the
@@ -2309,8 +2373,10 @@ func (f *Fpdf) SetAcceptPageBreakFunc(fnc func() bool) {
 //
 // linkStr is a target URL or empty for no external link. A non--zero value for
 // link takes precedence over linkStr.
-func (f *Fpdf) CellFormat(w, h float64, txtStr, borderStr string, ln int,
-	alignStr string, fill bool, link int, linkStr string) {
+func (f *Fpdf) CellFormat(
+	w, h float64, txtStr, borderStr string, ln int,
+	alignStr string, fill bool, link int, linkStr string,
+) {
 	// dbg("CellFormat. h = %.2f, borderStr = %s", h, borderStr)
 	if f.err != nil {
 		return
@@ -2925,7 +2991,7 @@ func (f *Fpdf) WriteLinkID(h float64, displayStr string, linkID int) {
 //
 // width indicates the width of the box the text will be drawn in. This is in
 // the unit of measure specified in New(). If it is set to 0, the bounding box
-//of the page will be taken (pageWidth - leftMargin - rightMargin).
+// of the page will be taken (pageWidth - leftMargin - rightMargin).
 //
 // lineHeight indicates the line height in the unit of measure specified in
 // New().
@@ -3109,7 +3175,14 @@ func (f *Fpdf) Image(imageNameStr string, x, y, w, h float64, flow bool, tp stri
 // If link refers to an internal page anchor (that is, it is non-zero; see
 // AddLink()), the image will be a clickable internal link. Otherwise, if
 // linkStr specifies a URL, the image will be a clickable external link.
-func (f *Fpdf) ImageOptions(imageNameStr string, x, y, w, h float64, flow bool, options ImageOptions, link int, linkStr string) {
+func (f *Fpdf) ImageOptions(
+	imageNameStr string,
+	x, y, w, h float64,
+	flow bool,
+	options ImageOptions,
+	link int,
+	linkStr string,
+) {
 	if f.err != nil {
 		return
 	}
@@ -3325,7 +3398,14 @@ func (f *Fpdf) putImportedTemplates() {
 // UseImportedTemplate uses imported template from gofpdi. It draws imported
 // PDF page onto page.
 func (f *Fpdf) UseImportedTemplate(tplName string, scaleX float64, scaleY float64, tX float64, tY float64) {
-	f.outf("q 0 J 1 w 0 j 0 G 0 g q %.4F 0 0 %.4F %.4F %.4F cm %s Do Q Q\n", scaleX*f.k, scaleY*f.k, tX*f.k, (tY+f.h)*f.k, tplName)
+	f.outf(
+		"q 0 J 1 w 0 j 0 G 0 g q %.4F 0 0 %.4F %.4F %.4F cm %s Do Q Q\n",
+		scaleX*f.k,
+		scaleY*f.k,
+		tX*f.k,
+		(tY+f.h)*f.k,
+		tplName,
+	)
 }
 
 // ImportTemplates imports gofpdi template names into importedTplObjs for
@@ -3620,16 +3700,20 @@ func (f *Fpdf) dounderline(x, y float64, txt string) string {
 	up := float64(f.currentFont.Up)
 	ut := float64(f.currentFont.Ut) * f.userUnderlineThickness
 	w := f.GetStringWidth(txt) + f.ws*float64(blankCount(txt))
-	return sprintf("%.2f %.2f %.2f %.2f re f", x*f.k,
-		(f.h-(y-up/1000*f.fontSize))*f.k, w*f.k, -ut/1000*f.fontSizePt)
+	return sprintf(
+		"%.2f %.2f %.2f %.2f re f", x*f.k,
+		(f.h-(y-up/1000*f.fontSize))*f.k, w*f.k, -ut/1000*f.fontSizePt,
+	)
 }
 
 func (f *Fpdf) dostrikeout(x, y float64, txt string) string {
 	up := float64(f.currentFont.Up)
 	ut := float64(f.currentFont.Ut)
 	w := f.GetStringWidth(txt) + f.ws*float64(blankCount(txt))
-	return sprintf("%.2f %.2f %.2f %.2f re f", x*f.k,
-		(f.h-(y+4*up/1000*f.fontSize))*f.k, w*f.k, -ut/1000*f.fontSizePt)
+	return sprintf(
+		"%.2f %.2f %.2f %.2f re f", x*f.k,
+		(f.h-(y+4*up/1000*f.fontSize))*f.k, w*f.k, -ut/1000*f.fontSizePt,
+	)
 }
 
 func bufEqual(buf []byte, str string) bool {
@@ -3911,8 +3995,10 @@ func (f *Fpdf) putpages() {
 			var annots fmtBuffer
 			annots.printf("/Annots [")
 			for _, pl := range f.pageLinks[n] {
-				annots.printf("<</Type /Annot /Subtype /Link /Rect [%.2f %.2f %.2f %.2f] /Border [0 0 0] ",
-					pl.x, pl.y, pl.x+pl.wd, pl.y-pl.ht)
+				annots.printf(
+					"<</Type /Annot /Subtype /Link /Rect [%.2f %.2f %.2f %.2f] /Border [0 0 0] ",
+					pl.x, pl.y, pl.x+pl.wd, pl.y-pl.ht,
+				)
 				if pl.link == 0 {
 					annots.printf("/A <</S /URI /URI %s>>>>", f.textstring(pl.linkStr))
 				} else {
@@ -4092,8 +4178,10 @@ func (f *Fpdf) putfonts() {
 				s.printf("/Descent %d ", font.Desc.Descent)
 				s.printf("/CapHeight %d ", font.Desc.CapHeight)
 				s.printf("/Flags %d ", font.Desc.Flags)
-				s.printf("/FontBBox [%d %d %d %d] ", font.Desc.FontBBox.Xmin, font.Desc.FontBBox.Ymin,
-					font.Desc.FontBBox.Xmax, font.Desc.FontBBox.Ymax)
+				s.printf(
+					"/FontBBox [%d %d %d %d] ", font.Desc.FontBBox.Xmin, font.Desc.FontBBox.Ymin,
+					font.Desc.FontBBox.Xmax, font.Desc.FontBBox.Ymax,
+				)
 				s.printf("/ItalicAngle %d ", font.Desc.ItalicAngle)
 				s.printf("/StemV %d ", font.Desc.StemV)
 				s.printf("/MissingWidth %d ", font.Desc.MissingWidth)
@@ -4115,11 +4203,20 @@ func (f *Fpdf) putfonts() {
 				delete(CodeSignDictionary, 0)
 
 				f.newobj()
-				f.out(fmt.Sprintf("<</Type /Font\n/Subtype /Type0\n/BaseFont /%s\n/Encoding /Identity-H\n/DescendantFonts [%d 0 R]\n/ToUnicode %d 0 R>>\n"+"endobj", fontName, f.n+1, f.n+2))
+				f.out(
+					fmt.Sprintf(
+						"<</Type /Font\n/Subtype /Type0\n/BaseFont /%s\n/Encoding /Identity-H\n/DescendantFonts [%d 0 R]\n/ToUnicode %d 0 R>>\n"+"endobj",
+						fontName,
+						f.n+1,
+						f.n+2,
+					),
+				)
 
 				f.newobj()
-				f.out("<</Type /Font\n/Subtype /CIDFontType2\n/BaseFont /" + fontName + "\n" +
-					"/CIDSystemInfo " + strconv.Itoa(f.n+2) + " 0 R\n/FontDescriptor " + strconv.Itoa(f.n+3) + " 0 R")
+				f.out(
+					"<</Type /Font\n/Subtype /CIDFontType2\n/BaseFont /" + fontName + "\n" +
+						"/CIDSystemInfo " + strconv.Itoa(f.n+2) + " 0 R\n/FontDescriptor " + strconv.Itoa(f.n+3) + " 0 R",
+				)
 				if font.Desc.MissingWidth != 0 {
 					f.out("/DW " + strconv.Itoa(font.Desc.MissingWidth) + "")
 				}
@@ -4147,8 +4244,10 @@ func (f *Fpdf) putfonts() {
 				v = v | 4
 				v = v &^ 32
 				s.printf(" /Flags %d", v)
-				s.printf("/FontBBox [%d %d %d %d] ", font.Desc.FontBBox.Xmin, font.Desc.FontBBox.Ymin,
-					font.Desc.FontBBox.Xmax, font.Desc.FontBBox.Ymax)
+				s.printf(
+					"/FontBBox [%d %d %d %d] ", font.Desc.FontBBox.Xmin, font.Desc.FontBBox.Ymin,
+					font.Desc.FontBBox.Xmax, font.Desc.FontBBox.Ymax,
+				)
 				s.printf(" /ItalicAngle %d", font.Desc.ItalicAngle)
 				s.printf(" /StemV %d", font.Desc.StemV)
 				s.printf(" /MissingWidth %d", font.Desc.MissingWidth)
@@ -4525,8 +4624,10 @@ func (f *Fpdf) putBlendModes() {
 		bl := f.blendList[j]
 		f.newobj()
 		f.blendList[j].objNum = f.n
-		f.outf("<</Type /ExtGState /ca %s /CA %s /BM /%s>>",
-			bl.fillStr, bl.strokeStr, bl.modeStr)
+		f.outf(
+			"<</Type /ExtGState /ca %s /CA %s /BM /%s>>",
+			bl.fillStr, bl.strokeStr, bl.modeStr,
+		)
 		f.out("endobj")
 	}
 }
@@ -4545,11 +4646,15 @@ func (f *Fpdf) putGradients() {
 		f.newobj()
 		f.outf("<</ShadingType %d /ColorSpace /DeviceRGB", gr.tp)
 		if gr.tp == 2 {
-			f.outf("/Coords [%.5f %.5f %.5f %.5f] /Function %d 0 R /Extend [true true]>>",
-				gr.x1, gr.y1, gr.x2, gr.y2, f1)
+			f.outf(
+				"/Coords [%.5f %.5f %.5f %.5f] /Function %d 0 R /Extend [true true]>>",
+				gr.x1, gr.y1, gr.x2, gr.y2, f1,
+			)
 		} else if gr.tp == 3 {
-			f.outf("/Coords [%.5f %.5f 0 %.5f %.5f %.5f] /Function %d 0 R /Extend [true true]>>",
-				gr.x1, gr.y1, gr.x2, gr.y2, gr.r, f1)
+			f.outf(
+				"/Coords [%.5f %.5f 0 %.5f %.5f %.5f] /Function %d 0 R /Extend [true true]>>",
+				gr.x1, gr.y1, gr.x2, gr.y2, gr.r, f1,
+			)
 		}
 		f.out("endobj")
 		f.gradientList[j].objNum = f.n
@@ -4929,8 +5034,10 @@ func (f *Fpdf) ArcTo(x, y, rx, ry, degRotate, degStart, degEnd float64) {
 	f.arc(x, y, rx, ry, degRotate, degStart, degEnd, "", true)
 }
 
-func (f *Fpdf) arc(x, y, rx, ry, degRotate, degStart, degEnd float64,
-	styleStr string, path bool) {
+func (f *Fpdf) arc(
+	x, y, rx, ry, degRotate, degStart, degEnd float64,
+	styleStr string, path bool,
+) {
 	x *= f.k
 	y = (f.h - y) * f.k
 	rx *= f.k
@@ -4946,9 +5053,11 @@ func (f *Fpdf) arc(x, y, rx, ry, degRotate, degStart, degEnd float64,
 	dtm := dt / 3
 	if degRotate != 0 {
 		a := -degRotate * math.Pi / 180
-		f.outf("q %.5f %.5f %.5f %.5f %.5f %.5f cm",
+		f.outf(
+			"q %.5f %.5f %.5f %.5f %.5f %.5f cm",
 			math.Cos(a), -1*math.Sin(a),
-			math.Sin(a), math.Cos(a), x, y)
+			math.Sin(a), math.Cos(a), x, y,
+		)
 		x = 0
 		y = 0
 	}
@@ -4974,12 +5083,14 @@ func (f *Fpdf) arc(x, y, rx, ry, degRotate, degStart, degEnd float64,
 		b1 := y + ry*math.Sin(t)
 		c1 := -rx * math.Sin(t)
 		d1 := ry * math.Cos(t)
-		f.curve((a0+(c0*dtm))/f.k,
+		f.curve(
+			(a0+(c0*dtm))/f.k,
 			f.h-((b0+(d0*dtm))/f.k),
 			(a1-(c1*dtm))/f.k,
 			f.h-((b1-(d1*dtm))/f.k),
 			a1/f.k,
-			f.h-(b1/f.k))
+			f.h-(b1/f.k),
+		)
 		a0 = a1
 		b0 = b1
 		c0 = c1
