@@ -237,12 +237,13 @@ func addFont(familyStr, styleStr, fileStr string, f *Fpdf) {
 	}
 
 	if fileStr == "" {
-		f.err = fmt.Errorf("fileStr and fileBytes are empty")
+		f.err = fmt.Errorf("fileStr is empty")
 		return
 	}
 
 	var fileBytes []byte
-	fileBytes, f.err = os.ReadFile(fileStr)
+	fileLocation := path.Join(f.fontpath, fileStr)
+	fileBytes, f.err = os.ReadFile(fileLocation)
 	if f.err != nil {
 		return
 	}
