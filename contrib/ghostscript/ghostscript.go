@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/jung-kurt/gofpdf"
+	"github.com/Invoicing-Solution/gofpdf"
 )
 
 func report(fileStr string, err error) {
@@ -41,10 +41,12 @@ func full(name string) {
 }
 
 func min(name string) {
-	cmd := exec.Command("gs", "-sDEVICE=pdfwrite",
+	cmd := exec.Command(
+		"gs", "-sDEVICE=pdfwrite",
 		"-dCompatibilityLevel=1.4",
 		"-dPDFSETTINGS=/screen", "-dNOPAUSE", "-dQUIET",
-		"-dBATCH", "-sOutputFile="+name, "-")
+		"-dBATCH", "-sOutputFile="+name, "-",
+	)
 	inPipe, err := cmd.StdinPipe()
 	if err == nil {
 		errChan := make(chan error, 1)

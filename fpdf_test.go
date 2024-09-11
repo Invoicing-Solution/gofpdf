@@ -32,9 +32,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jung-kurt/gofpdf"
-	"github.com/jung-kurt/gofpdf/internal/example"
-	"github.com/jung-kurt/gofpdf/internal/files"
+	"github.com/Invoicing-Solution/gofpdf"
+	"github.com/Invoicing-Solution/gofpdf/internal/example"
+	"github.com/Invoicing-Solution/gofpdf/internal/files"
 )
 
 func init() {
@@ -42,7 +42,8 @@ func init() {
 }
 
 func cleanup() {
-	filepath.Walk(example.PdfDir(),
+	filepath.Walk(
+		example.PdfDir(),
 		func(path string, info os.FileInfo, err error) (reterr error) {
 			if info.Mode().IsRegular() {
 				dir, _ := filepath.Split(path)
@@ -55,7 +56,8 @@ func cleanup() {
 				}
 			}
 			return
-		})
+		},
+	)
 }
 
 func TestFpdfImplementPdf(t *testing.T) {
@@ -68,13 +70,15 @@ func TestFpdfImplementPdf(t *testing.T) {
 // TestPagedTemplate ensures new paged templates work
 func TestPagedTemplate(t *testing.T) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
-	tpl := pdf.CreateTemplate(func(t *gofpdf.Tpl) {
-		// this will be the second page, as a page is already
-		// created by default
-		t.AddPage()
-		t.AddPage()
-		t.AddPage()
-	})
+	tpl := pdf.CreateTemplate(
+		func(t *gofpdf.Tpl) {
+			// this will be the second page, as a page is already
+			// created by default
+			t.AddPage()
+			t.AddPage()
+			t.AddPage()
+		},
+	)
 
 	if tpl.NumPages() != 4 {
 		t.Fatalf("The template does not have the correct number of pages %d", tpl.NumPages())
@@ -194,27 +198,35 @@ func TestFooterFuncLpi(t *testing.T) {
 	)
 
 	// This set just for testing, only set SetFooterFuncLpi.
-	pdf.SetFooterFunc(func() {
-		pdf.SetY(-15)
-		pdf.SetFont("Arial", "I", 8)
-		pdf.CellFormat(0, 10, oldFooterFnc,
-			"", 0, "C", false, 0, "")
-	})
-	pdf.SetFooterFuncLpi(func(lastPage bool) {
-		pdf.SetY(-15)
-		pdf.SetFont("Arial", "I", 8)
-		pdf.CellFormat(0, 10, bothPages, "", 0, "L", false, 0, "")
-		if !lastPage {
-			pdf.CellFormat(0, 10, firstPageOnly, "", 0, "C", false, 0, "")
-		} else {
-			pdf.CellFormat(0, 10, lastPageOnly, "", 0, "C", false, 0, "")
-		}
-	})
+	pdf.SetFooterFunc(
+		func() {
+			pdf.SetY(-15)
+			pdf.SetFont("Arial", "I", 8)
+			pdf.CellFormat(
+				0, 10, oldFooterFnc,
+				"", 0, "C", false, 0, "",
+			)
+		},
+	)
+	pdf.SetFooterFuncLpi(
+		func(lastPage bool) {
+			pdf.SetY(-15)
+			pdf.SetFont("Arial", "I", 8)
+			pdf.CellFormat(0, 10, bothPages, "", 0, "L", false, 0, "")
+			if !lastPage {
+				pdf.CellFormat(0, 10, firstPageOnly, "", 0, "C", false, 0, "")
+			} else {
+				pdf.CellFormat(0, 10, lastPageOnly, "", 0, "C", false, 0, "")
+			}
+		},
+	)
 	pdf.AddPage()
 	pdf.SetFont("Arial", "B", 16)
 	for j := 1; j <= 40; j++ {
-		pdf.CellFormat(0, 10, fmt.Sprintf("Printing line number %d", j),
-			"", 1, "", false, 0, "")
+		pdf.CellFormat(
+			0, 10, fmt.Sprintf("Printing line number %d", j),
+			"", 1, "", false, 0, "",
+		)
 	}
 	if pdf.Error() != nil {
 		t.Fatalf("not expecting error when rendering text")
@@ -311,26 +323,34 @@ func Example() {
 func ExampleFpdf_AddPage() {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetTopMargin(30)
-	pdf.SetHeaderFuncMode(func() {
-		pdf.Image(example.ImageFile("logo.png"), 10, 6, 30, 0, false, "", 0, "")
-		pdf.SetY(5)
-		pdf.SetFont("Arial", "B", 15)
-		pdf.Cell(80, 0, "")
-		pdf.CellFormat(30, 10, "Title", "1", 0, "C", false, 0, "")
-		pdf.Ln(20)
-	}, true)
-	pdf.SetFooterFunc(func() {
-		pdf.SetY(-15)
-		pdf.SetFont("Arial", "I", 8)
-		pdf.CellFormat(0, 10, fmt.Sprintf("Page %d/{nb}", pdf.PageNo()),
-			"", 0, "C", false, 0, "")
-	})
+	pdf.SetHeaderFuncMode(
+		func() {
+			pdf.Image(example.ImageFile("logo.png"), 10, 6, 30, 0, false, "", 0, "")
+			pdf.SetY(5)
+			pdf.SetFont("Arial", "B", 15)
+			pdf.Cell(80, 0, "")
+			pdf.CellFormat(30, 10, "Title", "1", 0, "C", false, 0, "")
+			pdf.Ln(20)
+		}, true,
+	)
+	pdf.SetFooterFunc(
+		func() {
+			pdf.SetY(-15)
+			pdf.SetFont("Arial", "I", 8)
+			pdf.CellFormat(
+				0, 10, fmt.Sprintf("Page %d/{nb}", pdf.PageNo()),
+				"", 0, "C", false, 0, "",
+			)
+		},
+	)
 	pdf.AliasNbPages("")
 	pdf.AddPage()
 	pdf.SetFont("Times", "", 12)
 	for j := 1; j <= 40; j++ {
-		pdf.CellFormat(0, 10, fmt.Sprintf("Printing line number %d", j),
-			"", 1, "", false, 0, "")
+		pdf.CellFormat(
+			0, 10, fmt.Sprintf("Printing line number %d", j),
+			"", 1, "", false, 0, "",
+		)
 	}
 	fileStr := example.Filename("Fpdf_AddPage")
 	err := pdf.OutputFileAndClose(fileStr)
@@ -346,42 +366,50 @@ func ExampleFpdf_MultiCell() {
 	titleStr := "20000 Leagues Under the Seas"
 	pdf.SetTitle(titleStr, false)
 	pdf.SetAuthor("Jules Verne", false)
-	pdf.SetHeaderFunc(func() {
-		// Arial bold 15
-		pdf.SetFont("Arial", "B", 15)
-		// Calculate width of title and position
-		wd := pdf.GetStringWidth(titleStr) + 6
-		pdf.SetX((210 - wd) / 2)
-		// Colors of frame, background and text
-		pdf.SetDrawColor(0, 80, 180)
-		pdf.SetFillColor(230, 230, 0)
-		pdf.SetTextColor(220, 50, 50)
-		// Thickness of frame (1 mm)
-		pdf.SetLineWidth(1)
-		// Title
-		pdf.CellFormat(wd, 9, titleStr, "1", 1, "C", true, 0, "")
-		// Line break
-		pdf.Ln(10)
-	})
-	pdf.SetFooterFunc(func() {
-		// Position at 1.5 cm from bottom
-		pdf.SetY(-15)
-		// Arial italic 8
-		pdf.SetFont("Arial", "I", 8)
-		// Text color in gray
-		pdf.SetTextColor(128, 128, 128)
-		// Page number
-		pdf.CellFormat(0, 10, fmt.Sprintf("Page %d", pdf.PageNo()),
-			"", 0, "C", false, 0, "")
-	})
+	pdf.SetHeaderFunc(
+		func() {
+			// Arial bold 15
+			pdf.SetFont("Arial", "B", 15)
+			// Calculate width of title and position
+			wd := pdf.GetStringWidth(titleStr) + 6
+			pdf.SetX((210 - wd) / 2)
+			// Colors of frame, background and text
+			pdf.SetDrawColor(0, 80, 180)
+			pdf.SetFillColor(230, 230, 0)
+			pdf.SetTextColor(220, 50, 50)
+			// Thickness of frame (1 mm)
+			pdf.SetLineWidth(1)
+			// Title
+			pdf.CellFormat(wd, 9, titleStr, "1", 1, "C", true, 0, "")
+			// Line break
+			pdf.Ln(10)
+		},
+	)
+	pdf.SetFooterFunc(
+		func() {
+			// Position at 1.5 cm from bottom
+			pdf.SetY(-15)
+			// Arial italic 8
+			pdf.SetFont("Arial", "I", 8)
+			// Text color in gray
+			pdf.SetTextColor(128, 128, 128)
+			// Page number
+			pdf.CellFormat(
+				0, 10, fmt.Sprintf("Page %d", pdf.PageNo()),
+				"", 0, "C", false, 0, "",
+			)
+		},
+	)
 	chapterTitle := func(chapNum int, titleStr string) {
 		// 	// Arial 12
 		pdf.SetFont("Arial", "", 12)
 		// Background color
 		pdf.SetFillColor(200, 220, 255)
 		// Title
-		pdf.CellFormat(0, 6, fmt.Sprintf("Chapter %d : %s", chapNum, titleStr),
-			"", 1, "L", true, 0, "")
+		pdf.CellFormat(
+			0, 6, fmt.Sprintf("Chapter %d : %s", chapNum, titleStr),
+			"", 1, "L", true, 0, "",
+		)
 		// Line break
 		pdf.Ln(4)
 	}
@@ -438,8 +466,10 @@ func ExampleFpdf_SetLeftMargin() {
 		// Background color
 		pdf.SetFillColor(200, 220, 255)
 		// Title
-		pdf.CellFormat(0, 6, fmt.Sprintf("Chapter %d : %s", chapNum, titleStr),
-			"", 1, "L", true, 0, "")
+		pdf.CellFormat(
+			0, 6, fmt.Sprintf("Chapter %d : %s", chapNum, titleStr),
+			"", 1, "L", true, 0, "",
+		)
 		// Line break
 		pdf.Ln(4)
 		y0 = pdf.GetY()
@@ -467,51 +497,59 @@ func ExampleFpdf_SetLeftMargin() {
 		chapterTitle(num, titleStr)
 		chapterBody(fileStr)
 	}
-	pdf.SetAcceptPageBreakFunc(func() bool {
-		// Method accepting or not automatic page break
-		if crrntCol < 2 {
-			// Go to next column
-			setCol(crrntCol + 1)
-			// Set ordinate to top
-			pdf.SetY(y0)
-			// Keep on page
-			return false
-		}
-		// Go back to first column
-		setCol(0)
-		// Page break
-		return true
-	})
-	pdf.SetHeaderFunc(func() {
-		// Arial bold 15
-		pdf.SetFont("Arial", "B", 15)
-		// Calculate width of title and position
-		wd := pdf.GetStringWidth(titleStr) + 6
-		pdf.SetX((210 - wd) / 2)
-		// Colors of frame, background and text
-		pdf.SetDrawColor(0, 80, 180)
-		pdf.SetFillColor(230, 230, 0)
-		pdf.SetTextColor(220, 50, 50)
-		// Thickness of frame (1 mm)
-		pdf.SetLineWidth(1)
-		// Title
-		pdf.CellFormat(wd, 9, titleStr, "1", 1, "C", true, 0, "")
-		// Line break
-		pdf.Ln(10)
-		// Save ordinate
-		y0 = pdf.GetY()
-	})
-	pdf.SetFooterFunc(func() {
-		// Position at 1.5 cm from bottom
-		pdf.SetY(-15)
-		// Arial italic 8
-		pdf.SetFont("Arial", "I", 8)
-		// Text color in gray
-		pdf.SetTextColor(128, 128, 128)
-		// Page number
-		pdf.CellFormat(0, 10, fmt.Sprintf("Page %d", pdf.PageNo()),
-			"", 0, "C", false, 0, "")
-	})
+	pdf.SetAcceptPageBreakFunc(
+		func() bool {
+			// Method accepting or not automatic page break
+			if crrntCol < 2 {
+				// Go to next column
+				setCol(crrntCol + 1)
+				// Set ordinate to top
+				pdf.SetY(y0)
+				// Keep on page
+				return false
+			}
+			// Go back to first column
+			setCol(0)
+			// Page break
+			return true
+		},
+	)
+	pdf.SetHeaderFunc(
+		func() {
+			// Arial bold 15
+			pdf.SetFont("Arial", "B", 15)
+			// Calculate width of title and position
+			wd := pdf.GetStringWidth(titleStr) + 6
+			pdf.SetX((210 - wd) / 2)
+			// Colors of frame, background and text
+			pdf.SetDrawColor(0, 80, 180)
+			pdf.SetFillColor(230, 230, 0)
+			pdf.SetTextColor(220, 50, 50)
+			// Thickness of frame (1 mm)
+			pdf.SetLineWidth(1)
+			// Title
+			pdf.CellFormat(wd, 9, titleStr, "1", 1, "C", true, 0, "")
+			// Line break
+			pdf.Ln(10)
+			// Save ordinate
+			y0 = pdf.GetY()
+		},
+	)
+	pdf.SetFooterFunc(
+		func() {
+			// Position at 1.5 cm from bottom
+			pdf.SetY(-15)
+			// Arial italic 8
+			pdf.SetFont("Arial", "I", 8)
+			// Text color in gray
+			pdf.SetTextColor(128, 128, 128)
+			// Page number
+			pdf.CellFormat(
+				0, 10, fmt.Sprintf("Page %d", pdf.PageNo()),
+				"", 0, "C", false, 0, "",
+			)
+		},
+	)
 	printChapter(1, "A RUNAWAY REEF", example.TextFile("20k_c1.txt"))
 	printChapter(2, "THE PROS AND CONS", example.TextFile("20k_c2.txt"))
 	fileStr := example.Filename("Fpdf_SetLeftMargin_multicolumn")
@@ -586,8 +624,10 @@ func ExampleFpdf_SplitLines_tables() {
 			cellY := y + cellGap + (maxHt-cell.ht)/2
 			for splitJ := 0; splitJ < len(cell.list); splitJ++ {
 				pdf.SetXY(x+cellGap, cellY)
-				pdf.CellFormat(colWd-cellGap-cellGap, lineHt, string(cell.list[splitJ]), "", 0,
-					alignList[colJ], false, 0, "")
+				pdf.CellFormat(
+					colWd-cellGap-cellGap, lineHt, string(cell.list[splitJ]), "", 0,
+					alignList[colJ], false, 0, "",
+				)
 				cellY += lineHt
 			}
 			x += colWd
@@ -675,10 +715,14 @@ func ExampleFpdf_CellFormat_tables() {
 			pdf.SetX(left)
 			pdf.CellFormat(w[0], 6, c.nameStr, "LR", 0, "", false, 0, "")
 			pdf.CellFormat(w[1], 6, c.capitalStr, "LR", 0, "", false, 0, "")
-			pdf.CellFormat(w[2], 6, strDelimit(c.areaStr, ",", 3),
-				"LR", 0, "R", false, 0, "")
-			pdf.CellFormat(w[3], 6, strDelimit(c.popStr, ",", 3),
-				"LR", 0, "R", false, 0, "")
+			pdf.CellFormat(
+				w[2], 6, strDelimit(c.areaStr, ",", 3),
+				"LR", 0, "R", false, 0, "",
+			)
+			pdf.CellFormat(
+				w[3], 6, strDelimit(c.popStr, ",", 3),
+				"LR", 0, "R", false, 0, "",
+			)
 			pdf.Ln(-1)
 		}
 		pdf.SetX(left)
@@ -714,10 +758,14 @@ func ExampleFpdf_CellFormat_tables() {
 			pdf.SetX(left)
 			pdf.CellFormat(w[0], 6, c.nameStr, "LR", 0, "", fill, 0, "")
 			pdf.CellFormat(w[1], 6, c.capitalStr, "LR", 0, "", fill, 0, "")
-			pdf.CellFormat(w[2], 6, strDelimit(c.areaStr, ",", 3),
-				"LR", 0, "R", fill, 0, "")
-			pdf.CellFormat(w[3], 6, strDelimit(c.popStr, ",", 3),
-				"LR", 0, "R", fill, 0, "")
+			pdf.CellFormat(
+				w[2], 6, strDelimit(c.areaStr, ",", 3),
+				"LR", 0, "R", fill, 0, "",
+			)
+			pdf.CellFormat(
+				w[3], 6, strDelimit(c.popStr, ",", 3),
+				"LR", 0, "R", fill, 0, "",
+			)
 			pdf.Ln(-1)
 			fill = !fill
 		}
@@ -907,36 +955,42 @@ func ExampleFpdf_SetAcceptPageBreakFunc() {
 		pdf.SetLeftMargin(x)
 		pdf.SetX(x)
 	}
-	pdf.SetHeaderFunc(func() {
-		titleStr := "gofpdf"
-		pdf.SetFont("Helvetica", "B", 48)
-		wd := pdf.GetStringWidth(titleStr) + 6
-		pdf.SetX((pageWd - wd) / 2)
-		pdf.SetTextColor(128, 128, 160)
-		pdf.Write(12, titleStr[:2])
-		pdf.SetTextColor(128, 128, 128)
-		pdf.Write(12, titleStr[2:])
-		pdf.Ln(20)
-		y0 = pdf.GetY()
-	})
-	pdf.SetAcceptPageBreakFunc(func() bool {
-		if crrntCol < colNum-1 {
-			setCol(crrntCol + 1)
-			pdf.SetY(y0)
-			// Start new column, not new page
-			return false
-		}
-		setCol(0)
-		return true
-	})
+	pdf.SetHeaderFunc(
+		func() {
+			titleStr := "gofpdf"
+			pdf.SetFont("Helvetica", "B", 48)
+			wd := pdf.GetStringWidth(titleStr) + 6
+			pdf.SetX((pageWd - wd) / 2)
+			pdf.SetTextColor(128, 128, 160)
+			pdf.Write(12, titleStr[:2])
+			pdf.SetTextColor(128, 128, 128)
+			pdf.Write(12, titleStr[2:])
+			pdf.Ln(20)
+			y0 = pdf.GetY()
+		},
+	)
+	pdf.SetAcceptPageBreakFunc(
+		func() bool {
+			if crrntCol < colNum-1 {
+				setCol(crrntCol + 1)
+				pdf.SetY(y0)
+				// Start new column, not new page
+				return false
+			}
+			setCol(0)
+			return true
+		},
+	)
 	pdf.AddPage()
 	pdf.SetFont("Times", "", 12)
 	for j := 0; j < 20; j++ {
 		if j == 1 {
 			pdf.Image(example.ImageFile("fpdf.png"), -1, 0, colWd, 0, true, "", 0, "")
 		} else if j == 5 {
-			pdf.Image(example.ImageFile("golang-gopher.png"),
-				-1, 0, colWd, 0, true, "", 0, "")
+			pdf.Image(
+				example.ImageFile("golang-gopher.png"),
+				-1, 0, colWd, 0, true, "", 0, "",
+			)
 		}
 		pdf.MultiCell(colWd, 5, loremStr, "", "", false)
 		pdf.Ln(-1)
@@ -952,8 +1006,10 @@ func ExampleFpdf_SetAcceptPageBreakFunc() {
 func ExampleFpdf_SetKeywords() {
 	var err error
 	fileStr := example.Filename("Fpdf_SetKeywords")
-	err = gofpdf.MakeFont(example.FontFile("CalligrapherRegular.pfb"),
-		example.FontFile("cp1252.map"), example.FontDir(), nil, true)
+	err = gofpdf.MakeFont(
+		example.FontFile("CalligrapherRegular.pfb"),
+		example.FontFile("cp1252.map"), example.FontDir(), nil, true,
+	)
 	if err == nil {
 		pdf := gofpdf.New("", "", "", "")
 		pdf.SetFontLocation(example.FontDir())
@@ -1066,9 +1122,11 @@ func ExampleFpdf_SetAlpha() {
 		pageW = 210
 		pageH = 297
 	)
-	modeList := []string{"Normal", "Multiply", "Screen", "Overlay",
+	modeList := []string{
+		"Normal", "Multiply", "Screen", "Overlay",
 		"Darken", "Lighten", "ColorDodge", "ColorBurn", "HardLight", "SoftLight",
-		"Difference", "Exclusion", "Hue", "Saturation", "Color", "Luminosity"}
+		"Difference", "Exclusion", "Hue", "Saturation", "Color", "Luminosity",
+	}
 	pdf := gofpdf.New("", "", "", "")
 	pdf.SetLineWidth(2)
 	pdf.SetAutoPageBreak(false, 0)
@@ -1093,8 +1151,10 @@ func ExampleFpdf_SetAlpha() {
 			pdf.SetXY(x, y+2)
 			pdf.CellFormat(rectW, rectH, "A", "", 0, "C", false, 0, "")
 			pdf.SetAlpha(0.5, modeList[j])
-			pdf.Image(example.ImageFile("golang-gopher.png"),
-				x-gapX, y, rectW+2*gapX, 0, false, "", 0, "")
+			pdf.Image(
+				example.ImageFile("golang-gopher.png"),
+				x-gapX, y, rectW+2*gapX, 0, false, "", 0, "",
+			)
 			pdf.SetAlpha(1.0, "Normal")
 			x += rectW + gapX
 			j++
@@ -1118,11 +1178,15 @@ func ExampleFpdf_LinearGradient() {
 	pdf.Rect(20, 25, 75, 75, "D")
 	pdf.LinearGradient(115, 25, 75, 75, 220, 220, 250, 80, 80, 220, 0, 0, 1, 1)
 	pdf.Rect(115, 25, 75, 75, "D")
-	pdf.RadialGradient(20, 120, 75, 75, 220, 220, 250, 80, 80, 220,
-		0.25, 0.75, 0.25, 0.75, 1)
+	pdf.RadialGradient(
+		20, 120, 75, 75, 220, 220, 250, 80, 80, 220,
+		0.25, 0.75, 0.25, 0.75, 1,
+	)
 	pdf.Rect(20, 120, 75, 75, "D")
-	pdf.RadialGradient(115, 120, 75, 75, 220, 220, 250, 80, 80, 220,
-		0.25, 0.75, 0.75, 0.75, 0.75)
+	pdf.RadialGradient(
+		115, 120, 75, 75, 220, 220, 250, 80, 80, 220,
+		0.25, 0.75, 0.75, 0.75, 0.75,
+	)
 	pdf.Rect(115, 120, 75, 75, "D")
 	fileStr := example.Filename("Fpdf_LinearGradient_gradient")
 	err := pdf.OutputFileAndClose(fileStr)
@@ -1140,8 +1204,10 @@ func ExampleFpdf_ClipText() {
 	pdf.SetFont("Helvetica", "", 24)
 	pdf.SetXY(0, y)
 	pdf.ClipText(10, y+12, "Clipping examples", false)
-	pdf.RadialGradient(10, y, 100, 20, 128, 128, 160, 32, 32, 48,
-		0.25, 0.5, 0.25, 0.5, 0.2)
+	pdf.RadialGradient(
+		10, y, 100, 20, 128, 128, 160, 32, 32, 48,
+		0.25, 0.5, 0.25, 0.5, 0.2,
+	)
 	pdf.ClipEnd()
 
 	y += 12
@@ -1149,8 +1215,10 @@ func ExampleFpdf_ClipText() {
 	pdf.SetDrawColor(64, 80, 80)
 	pdf.SetLineWidth(.5)
 	pdf.ClipText(10, y+40, pdf.String(), true)
-	pdf.RadialGradient(10, y, 200, 50, 220, 220, 250, 80, 80, 220,
-		0.25, 0.5, 0.25, 0.5, 1)
+	pdf.RadialGradient(
+		10, y, 200, 50, 220, 220, 250, 80, 80, 220,
+		0.25, 0.5, 0.25, 0.5, 1,
+	)
 	pdf.ClipEnd()
 
 	y += 55
@@ -1158,12 +1226,16 @@ func ExampleFpdf_ClipText() {
 	pdf.SetFillColor(255, 255, 255)
 	pdf.Rect(10, y, 105, 20, "F")
 	pdf.ClipCircle(40, y+10, 15, false)
-	pdf.RadialGradient(25, y, 30, 30, 220, 250, 220, 40, 60, 40, 0.3,
-		0.85, 0.3, 0.85, 0.5)
+	pdf.RadialGradient(
+		25, y, 30, 30, 220, 250, 220, 40, 60, 40, 0.3,
+		0.85, 0.3, 0.85, 0.5,
+	)
 	pdf.ClipEnd()
 	pdf.ClipEllipse(80, y+10, 20, 15, false)
-	pdf.RadialGradient(60, y, 40, 30, 250, 220, 220, 60, 40, 40, 0.3,
-		0.85, 0.3, 0.85, 0.5)
+	pdf.RadialGradient(
+		60, y, 40, 30, 250, 220, 220, 60, 40, 40, 0.3,
+		0.85, 0.3, 0.85, 0.5,
+	)
 	pdf.ClipEnd()
 	pdf.ClipEnd()
 
@@ -1173,22 +1245,32 @@ func ExampleFpdf_ClipText() {
 	pdf.ClipEnd()
 
 	pdf.ClipCircle(60, y+10, 10, true)
-	pdf.RadialGradient(50, y, 20, 20, 220, 220, 250, 40, 40, 60, 0.3,
-		0.7, 0.3, 0.7, 0.5)
+	pdf.RadialGradient(
+		50, y, 20, 20, 220, 220, 250, 40, 40, 60, 0.3,
+		0.7, 0.3, 0.7, 0.5,
+	)
 	pdf.ClipEnd()
 
-	pdf.ClipPolygon([]gofpdf.PointType{{X: 80, Y: y + 20}, {X: 90, Y: y},
-		{X: 100, Y: y + 20}}, true)
-	pdf.LinearGradient(80, y, 20, 20, 250, 220, 250, 60, 40, 60, 0.5,
-		1, 0.5, 0.5)
+	pdf.ClipPolygon(
+		[]gofpdf.PointType{
+			{X: 80, Y: y + 20}, {X: 90, Y: y},
+			{X: 100, Y: y + 20},
+		}, true,
+	)
+	pdf.LinearGradient(
+		80, y, 20, 20, 250, 220, 250, 60, 40, 60, 0.5,
+		1, 0.5, 0.5,
+	)
 	pdf.ClipEnd()
 
 	y += 30
 	pdf.SetLineWidth(.1)
 	pdf.SetDrawColor(180, 180, 180)
 	pdf.ClipRoundedRect(10, y, 120, 20, 5, true)
-	pdf.RadialGradient(10, y, 120, 20, 255, 255, 255, 240, 240, 220,
-		0.25, 0.75, 0.25, 0.75, 0.5)
+	pdf.RadialGradient(
+		10, y, 120, 20, 255, 255, 255, 240, 240, 220,
+		0.25, 0.75, 0.25, 0.75, 0.5,
+	)
 	pdf.SetXY(5, y-5)
 	pdf.SetFont("Times", "", 12)
 	pdf.MultiCell(130, 5, lorem(), "", "", false)
@@ -1197,8 +1279,10 @@ func ExampleFpdf_ClipText() {
 	y += 30
 	pdf.SetDrawColor(180, 100, 180)
 	pdf.ClipRoundedRectExt(10, y, 120, 20, 5, 10, 5, 10, true)
-	pdf.RadialGradient(10, y, 120, 20, 255, 255, 255, 240, 240, 220,
-		0.25, 0.75, 0.25, 0.75, 0.5)
+	pdf.RadialGradient(
+		10, y, 120, 20, 255, 255, 255, 240, 240, 220,
+		0.25, 0.75, 0.25, 0.75, 0.5,
+	)
 	pdf.SetXY(5, y-5)
 	pdf.SetFont("Times", "", 12)
 	pdf.MultiCell(130, 5, lorem(), "", "", false)
@@ -1213,11 +1297,13 @@ func ExampleFpdf_ClipText() {
 
 // ExampleFpdf_PageSize generates a PDF document with various page sizes.
 func ExampleFpdf_PageSize() {
-	pdf := gofpdf.NewCustom(&gofpdf.InitType{
-		UnitStr:    "in",
-		Size:       gofpdf.SizeType{Wd: 6, Ht: 6},
-		FontDirStr: example.FontDir(),
-	})
+	pdf := gofpdf.NewCustom(
+		&gofpdf.InitType{
+			UnitStr:    "in",
+			Size:       gofpdf.SizeType{Wd: 6, Ht: 6},
+			FontDirStr: example.FontDir(),
+		},
+	)
 	pdf.SetMargins(0.5, 1, 0.5)
 	pdf.SetFont("Times", "", 14)
 	pdf.AddPageFormat("L", gofpdf.SizeType{Wd: 3, Ht: 12})
@@ -1307,8 +1393,10 @@ func ExampleFpdf_TransformBegin() {
 	pdf.TransformMirrorVertical(10 + titleHt + 0.5)
 	pdf.ClipText(titleX, 10+titleHt, titleStr, false)
 	// Remember that the transform will mirror the gradient box too
-	pdf.LinearGradient(titleX, 10, titleWd, titleHt+4, 120, 120, 120,
-		255, 255, 255, 0, 0, 0, 0.6)
+	pdf.LinearGradient(
+		titleX, 10, titleWd, titleHt+4, 120, 120, 120,
+		255, 255, 255, 0, 0, 0, 0.6,
+	)
 	pdf.ClipEnd()
 	pdf.TransformEnd()
 
@@ -1646,8 +1734,10 @@ func ExampleFpdf_CellFormat_codepage() {
 	write("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.")
 	write("Heizölrückstoßabdämpfung")
 	write("Forårsjævndøgn / Efterårsjævndøgn")
-	write("À noite, vovô Kowalsky vê o ímã cair no pé do pingüim queixoso e vovó" +
-		"põe açúcar no chá de tâmaras do jabuti feliz.")
+	write(
+		"À noite, vovô Kowalsky vê o ímã cair no pé do pingüim queixoso e vovó" +
+			"põe açúcar no chá de tâmaras do jabuti feliz.",
+	)
 	pdf.SetFont("Helvetica-1251", "", fontSize) // Name matches one specified in AddFont()
 	tr = pdf.UnicodeTranslatorFromDescriptor("cp1251")
 	write("Съешь же ещё этих мягких французских булок, да выпей чаю.")
@@ -1692,9 +1782,12 @@ func ExampleFpdf_Polygon() {
 		mlt := 2.0 * math.Pi / float64(count)
 		for j := 0; j < count; j++ {
 			pt.Y, pt.X = math.Sincos(float64(j) * mlt)
-			res = append(res, gofpdf.PointType{
-				X: x + radius*pt.X,
-				Y: y + radius*pt.Y})
+			res = append(
+				res, gofpdf.PointType{
+					X: x + radius*pt.X,
+					Y: y + radius*pt.Y,
+				},
+			)
 		}
 		return
 	}
@@ -1797,8 +1890,10 @@ func ExampleFpdf_RegisterImageReader() {
 		infoPtr := pdf.RegisterImageReader(urlStr, tp, rsp.Body)
 		if pdf.Ok() {
 			imgWd, imgHt := infoPtr.Extent()
-			pdf.Image(urlStr, (wd-imgWd)/2.0, pdf.GetY()+ln,
-				imgWd, imgHt, false, tp, 0, "")
+			pdf.Image(
+				urlStr, (wd-imgWd)/2.0, pdf.GetY()+ln,
+				imgWd, imgHt, false, tp, 0, "",
+			)
 		}
 	} else {
 		pdf.SetError(err)
@@ -2063,30 +2158,36 @@ func ExampleFpdf_CreateTemplate() {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.SetCompression(false)
 	// pdf.SetFont("Times", "", 12)
-	template := pdf.CreateTemplate(func(tpl *gofpdf.Tpl) {
-		tpl.Image(example.ImageFile("logo.png"), 6, 6, 30, 0, false, "", 0, "")
-		tpl.SetFont("Arial", "B", 16)
-		tpl.Text(40, 20, "Template says hello")
-		tpl.SetDrawColor(0, 100, 200)
-		tpl.SetLineWidth(2.5)
-		tpl.Line(95, 12, 105, 22)
-	})
+	template := pdf.CreateTemplate(
+		func(tpl *gofpdf.Tpl) {
+			tpl.Image(example.ImageFile("logo.png"), 6, 6, 30, 0, false, "", 0, "")
+			tpl.SetFont("Arial", "B", 16)
+			tpl.Text(40, 20, "Template says hello")
+			tpl.SetDrawColor(0, 100, 200)
+			tpl.SetLineWidth(2.5)
+			tpl.Line(95, 12, 105, 22)
+		},
+	)
 	_, tplSize := template.Size()
 	// fmt.Println("Size:", tplSize)
 	// fmt.Println("Scaled:", tplSize.ScaleBy(1.5))
 
-	template2 := pdf.CreateTemplate(func(tpl *gofpdf.Tpl) {
-		tpl.UseTemplate(template)
-		subtemplate := tpl.CreateTemplate(func(tpl2 *gofpdf.Tpl) {
-			tpl2.Image(example.ImageFile("logo.png"), 6, 86, 30, 0, false, "", 0, "")
-			tpl2.SetFont("Arial", "B", 16)
-			tpl2.Text(40, 100, "Subtemplate says hello")
-			tpl2.SetDrawColor(0, 200, 100)
-			tpl2.SetLineWidth(2.5)
-			tpl2.Line(102, 92, 112, 102)
-		})
-		tpl.UseTemplate(subtemplate)
-	})
+	template2 := pdf.CreateTemplate(
+		func(tpl *gofpdf.Tpl) {
+			tpl.UseTemplate(template)
+			subtemplate := tpl.CreateTemplate(
+				func(tpl2 *gofpdf.Tpl) {
+					tpl2.Image(example.ImageFile("logo.png"), 6, 86, 30, 0, false, "", 0, "")
+					tpl2.SetFont("Arial", "B", 16)
+					tpl2.Text(40, 100, "Subtemplate says hello")
+					tpl2.SetDrawColor(0, 200, 100)
+					tpl2.SetLineWidth(2.5)
+					tpl2.Line(102, 92, 112, 102)
+				},
+			)
+			tpl.UseTemplate(subtemplate)
+		},
+	)
 
 	pdf.SetDrawColor(200, 100, 0)
 	pdf.SetLineWidth(2.5)
@@ -2349,10 +2450,12 @@ func ExampleNewGrid() {
 	pdf.SetDrawColor(255, 64, 64)
 	pdf.SetAlpha(0.5, "Normal")
 	pdf.SetLineWidth(1.2)
-	gr.Plot(pdf, 0.5, 11.5, 50, func(x float64) float64 {
-		// http://www.xuru.org/rt/PR.asp
-		return 0.227 * math.Exp(-0.0373*x*x+0.471*x)
-	})
+	gr.Plot(
+		pdf, 0.5, 11.5, 50, func(x float64) float64 {
+			// http://www.xuru.org/rt/PR.asp
+			return 0.227 * math.Exp(-0.0373*x*x+0.471*x)
+		},
+	)
 	pdf.SetAlpha(1.0, "Normal")
 	pdf.SetXY(gr.X(0.5), gr.Y(1.35))
 	pdf.SetFontSize(14)
@@ -2438,7 +2541,10 @@ func ExampleFpdf_SubWrite() {
 	pdf.Ln(lineHt * 2)
 
 	pdf.SubWrite(lineHt, "Y", 6, 0, 0, "")
-	pdf.Write(lineHt, "ou can also begin the sentence with a small letter. And word wrap also works if the line is too long, like this one is.")
+	pdf.Write(
+		lineHt,
+		"ou can also begin the sentence with a small letter. And word wrap also works if the line is too long, like this one is.",
+	)
 	pdf.SetX(halfX)
 	pdf.Write(lineHt, "This is text with a small first letter.\n")
 	pdf.Ln(lineHt * 2)
@@ -2572,16 +2678,18 @@ func ExampleFpdf_TransformRotate() {
 	ctrX := 210.0 / 2.0
 	ctrY := 297.0 / 2.0
 
-	pdf.SetHeaderFunc(func() {
-		pdf.SetFont("Arial", "B", markFontHt)
-		pdf.SetTextColor(206, 216, 232)
-		pdf.SetXY(margin, markY)
-		pdf.TransformBegin()
-		pdf.TransformRotate(45, ctrX, ctrY)
-		pdf.CellFormat(0, markLineHt, "W A T E R M A R K   D E M O", "", 0, "C", false, 0, "")
-		pdf.TransformEnd()
-		pdf.SetXY(margin, margin)
-	})
+	pdf.SetHeaderFunc(
+		func() {
+			pdf.SetFont("Arial", "B", markFontHt)
+			pdf.SetTextColor(206, 216, 232)
+			pdf.SetXY(margin, markY)
+			pdf.TransformBegin()
+			pdf.TransformRotate(45, ctrX, ctrY)
+			pdf.CellFormat(0, markLineHt, "W A T E R M A R K   D E M O", "", 0, "C", false, 0, "")
+			pdf.TransformEnd()
+			pdf.SetXY(margin, margin)
+		},
+	)
 
 	pdf.AddPage()
 	pdf.SetFont("Arial", "", 8)
@@ -2788,10 +2896,12 @@ func ExampleFpdf_SetTextRenderingMode() {
 	fontSz := float64(16)
 	lineSz := pdf.PointToUnitConvert(fontSz)
 	pdf.SetFont("Times", "", fontSz)
-	pdf.Write(lineSz, "This document demonstrates various modes of text rendering. Search for \"Mode 3\" "+
-		"to locate text that has been rendered invisibly. This selection can be copied "+
-		"into the clipboard as usual and is useful for overlaying onto non-textual elements such "+
-		"as images to make them searchable.\n\n")
+	pdf.Write(
+		lineSz, "This document demonstrates various modes of text rendering. Search for \"Mode 3\" "+
+			"to locate text that has been rendered invisibly. This selection can be copied "+
+			"into the clipboard as usual and is useful for overlaying onto non-textual elements such "+
+			"as images to make them searchable.\n\n",
+	)
 	fontSz = float64(125)
 	lineSz = pdf.PointToUnitConvert(fontSz)
 	pdf.SetFontSize(fontSz)
