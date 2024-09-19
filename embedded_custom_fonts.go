@@ -65,3 +65,15 @@ var archivoItalic []byte
 
 //go:embed font/Archivo-BoldItalic.ttf
 var archivoBoldItalic []byte
+
+//go:embed font/Open-Sans-Regular.ttf
+var openSansRegular []byte
+
+//go:embed font/Open-Sans-Bold.ttf
+var openSansBold []byte
+
+//go:embed font/Open-Sans-Italic.ttf
+var openSansItalic []byte
+
+//go:embed font/Open-Sans-BoldItalic.ttf
+var openSansBoldItalic []byte
