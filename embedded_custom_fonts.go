@@ -53,3 +53,15 @@ var merriweatherItalic []byte
 
 //go:embed font/Merriweather-BoldItalic.ttf
 var merriweatherBoldItalic []byte
+
+//go:embed font/Archivo-Regular.ttf
+var archivoRegular []byte
+
+//go:embed font/Archivo-Bold.ttf
+var archivoBold []byte
+
+//go:embed font/Archivo-Italic.ttf
+var archivoItalic []byte
+
+//go:embed font/Archivo-BoldItalic.ttf
+var archivoBoldItalic []byte
