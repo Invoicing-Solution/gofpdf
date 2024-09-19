@@ -53,3 +53,15 @@ var montserratItalic []byte
 
 //go:embed font/Montserrat-BoldItalic.ttf
 var montserratBoldItalic []byte
+
+//go:embed font/Merriweather-Regular.ttf
+var merriweatherRegular []byte
+
+//go:embed font/Merriweather-Bold.ttf
+var merriweatherBold []byte
+
+//go:embed font/Merriweather-Italic.ttf
+var merriweatherItalic []byte
+
+//go:embed font/Merriweather-BoldItalic.ttf
+var merriweatherBoldItalic []byte
