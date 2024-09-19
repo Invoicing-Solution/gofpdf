@@ -41,3 +41,15 @@ var interItalic []byte
 
 //go:embed font/Inter-BoldItalic.ttf
 var interBoldItalic []byte
+
+//go:embed font/Montserrat-Regular.ttf
+var montserratRegular []byte
+
+//go:embed font/Montserrat-Bold.ttf
+var montserratBold []byte
+
+//go:embed font/Montserrat-Italic.ttf
+var montserratItalic []byte
+
+//go:embed font/Montserrat-BoldItalic.ttf
+var montserratBoldItalic []byte
