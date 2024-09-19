@@ -219,10 +219,6 @@ func addCustomFont(f *Fpdf, name, style string, bytes []byte) {
 }
 
 func addCustomFonts(f *Fpdf) {
-	addCustomFont(f, "Arial", "", arial)
-	addCustomFont(f, "Arial", "B", arialBold)
-	addCustomFont(f, "Arial", "I", arialItalic)
-	addCustomFont(f, "Arial", "BI", arialBoldItalic)
 	addCustomFont(f, "Arimo", "", arimo)
 	addCustomFont(f, "Arimo", "B", arimoBold)
 	addCustomFont(f, "Arimo", "I", arimoItalic)
