@@ -6,18 +6,6 @@ import (
 
 // Embed the font files
 
-//go:embed font/Arial.ttf
-var arial []byte
-
-//go:embed font/Arial-Bold.ttf
-var arialBold []byte
-
-//go:embed font/Arial-Italic.ttf
-var arialItalic []byte
-
-//go:embed font/Arial-BoldItalic.ttf
-var arialBoldItalic []byte
-
 //go:embed font/Arimo.ttf
 var arimo []byte
 
