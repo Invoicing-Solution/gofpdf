@@ -243,6 +243,10 @@ func addCustomFonts(f *Fpdf) {
 	addCustomFont(f, "Open-Sans", "B", openSansBold)
 	addCustomFont(f, "Open-Sans", "I", openSansItalic)
 	addCustomFont(f, "Open-Sans", "BI", openSansBoldItalic)
+	addCustomFont(f, "Playfair", "", playfairRegular)
+	addCustomFont(f, "Playfair", "B", playfairBold)
+	addCustomFont(f, "Playfair", "I", playfairItalic)
+	addCustomFont(f, "Playfair", "BI", playfairBoldItalic)
 }
 
 // NewCustom returns a pointer to a new Fpdf instance. Its methods are
