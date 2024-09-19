@@ -77,3 +77,15 @@ var openSansItalic []byte
 
 //go:embed font/Open-Sans-BoldItalic.ttf
 var openSansBoldItalic []byte
+
+//go:embed font/Playfair-Regular.ttf
+var playfairRegular []byte
+
+//go:embed font/Playfair-Bold.ttf
+var playfairBold []byte
+
+//go:embed font/Playfair-Italic.ttf
+var playfairItalic []byte
+
+//go:embed font/Playfair-BoldItalic.ttf
+var playfairBoldItalic []byte
